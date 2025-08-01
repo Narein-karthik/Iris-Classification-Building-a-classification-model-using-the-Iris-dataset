@@ -1,0 +1,54 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.preprocessing import LabelEncoder
+import sys
+
+
+try:
+    df = pd.read_csv('add your dataset path here')
+    print("Dataset loaded successfully from uploaded file!")
+    print("First 5 records:\n", df.head())
+    print("\nDataset shape:", df.shape)
+
+except FileNotFoundError:
+    print("Error: The file 'archive.zip/IRIS.csv' was not found.")
+    print("Please ensure the dataset is correctly uploaded and named.")
+    sys.exit(1)
+
+
+if 'Id' in df.columns:
+    df = df.drop('Id', axis=1)
+    
+X = df.drop('species', axis=1) 
+y = df['species']
+
+label_encoder = LabelEncoder()
+y = label_encoder.fit_transform(y)
+print("\nTarget variable converted to numerical labels.")
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+print("\nData split into training and testing sets:")
+print(f"Training data shape: {X_train.shape}")
+print(f"Testing data shape: {X_test.shape}")
+
+
+model = DecisionTreeClassifier(random_state=42)
+
+# Train the model on the training data
+print("\nTraining the Decision Tree Classifier...")
+model.fit(X_train, y_train)
+print("Model training complete!")
+
+
+y_pred = model.predict(X_test)
+
+accuracy = accuracy_score(y_test, y_pred)
+print(f"\nModel Accuracy: {accuracy:.2f}")
+
+class_report = classification_report(y_test, y_pred, target_names=label_encoder.classes_)
+print("\nClassification Report:\n", class_report)
+
+
